@@ -10,3 +10,8 @@ void USpellWidgetController::SetWidgetControllerParams(const FWidgetControllerPa
 	AbilitySystemComponent = WCParams.AbilitySystemComponent;
 	AttributeSet = WCParams.AttributeSet;
 }
+
+void USpellWidgetController::BroadcastInitialValues()
+{
+	
+}
