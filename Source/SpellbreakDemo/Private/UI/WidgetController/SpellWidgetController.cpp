@@ -15,3 +15,8 @@ void USpellWidgetController::BroadcastInitialValues()
 {
 	
 }
+
+void USpellWidgetController::BindCallbacksToDependencies()
+{
+	
+}
