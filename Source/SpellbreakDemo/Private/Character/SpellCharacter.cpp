@@ -5,7 +5,9 @@
 
 #include "AbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Player/SpellPlayerController.h"
 #include "Player/SpellPlayerState.h"
+#include "UI/HUD/SpellHUD.h"
 
 ASpellCharacter::ASpellCharacter()
 {
@@ -42,6 +44,15 @@ void ASpellCharacter::InitAbilityActorInfo()
 	
 	AbilitySystemComponent = SpellPlayerState->GetAbilitySystemComponent();
 	AttributeSet = SpellPlayerState->GetAttributeSet();
+
+	if (ASpellPlayerController* SpellPlayerController = Cast<ASpellPlayerController>(GetController()))
+	{
+		if(ASpellHUD* SpellHUD = Cast<ASpellHUD>(SpellPlayerController->GetHUD()))
+		{
+			SpellHUD->InitOverlay(SpellPlayerController, SpellPlayerState, AbilitySystemComponent, AttributeSet);
+		}
+	}
+	
 }
 
 
