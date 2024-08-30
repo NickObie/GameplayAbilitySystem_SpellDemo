@@ -28,6 +28,7 @@ void ASpellEffectActor::OnOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 		const USpellAttributeSet* SpellAttributeSet = Cast<USpellAttributeSet>(ASCInterface->GetAbilitySystemComponent()->GetAttributeSet(USpellAttributeSet::StaticClass()));
 		USpellAttributeSet* MutableSpellAttributeSet = const_cast<USpellAttributeSet*>(SpellAttributeSet);
 		MutableSpellAttributeSet->SetHealth(SpellAttributeSet->GetHealth() + 25.f);
+		MutableSpellAttributeSet->SetMana(SpellAttributeSet->GetMana() - 25.f);
 		Destroy();
 	}
 }
