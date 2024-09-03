@@ -3,46 +3,32 @@
 
 #include "Actor/SpellEffectActor.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
-#include "AbilitySystemInterface.h"
-#include "AbilitySystem/SpellAttributeSet.h"
-#include "Components/SphereComponent.h"
+
 
 ASpellEffectActor::ASpellEffectActor()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
-	SetRootComponent(Mesh);
-	
-	Sphere = CreateDefaultSubobject<USphereComponent>("Sphere");
-	Sphere->SetupAttachment(GetRootComponent());
+	SetRootComponent(CreateDefaultSubobject<USceneComponent>("SceneRoot"));
 }
 
-void ASpellEffectActor::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	//TODO: Change this to apply a gameplay effect. For now, using const cast as a hack!
-	if (IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(OtherActor))
-	{
-		const USpellAttributeSet* SpellAttributeSet = Cast<USpellAttributeSet>(ASCInterface->GetAbilitySystemComponent()->GetAttributeSet(USpellAttributeSet::StaticClass()));
-		USpellAttributeSet* MutableSpellAttributeSet = const_cast<USpellAttributeSet*>(SpellAttributeSet);
-		MutableSpellAttributeSet->SetHealth(SpellAttributeSet->GetHealth() + 25.f);
-		MutableSpellAttributeSet->SetMana(SpellAttributeSet->GetMana() - 25.f);
-		Destroy();
-	}
-}
-
-void ASpellEffectActor::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	
-}
 
 void ASpellEffectActor::BeginPlay()
 {
 	Super::BeginPlay();
+	
+}
 
-	Sphere->OnComponentBeginOverlap.AddDynamic(this, &ASpellEffectActor::OnOverlap);
-	Sphere->OnComponentEndOverlap.AddDynamic(this, &ASpellEffectActor::EndOverlap);
+void ASpellEffectActor::ApplyEffectToTarget(AActor* Target, TSubclassOf<UGameplayEffect> GameplayEffectClass)
+{
+	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Target);
+	if (TargetASC == nullptr) return;
+
+	check(GameplayEffectClass);
+	FGameplayEffectContextHandle EffectContextHandle = TargetASC->MakeEffectContext();
+	EffectContextHandle.AddSourceObject(this);
+	const FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(GameplayEffectClass, 1.0f, EffectContextHandle); 
+	TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
 }
