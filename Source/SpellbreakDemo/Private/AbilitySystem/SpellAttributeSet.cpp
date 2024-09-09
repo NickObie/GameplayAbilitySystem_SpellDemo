@@ -22,6 +22,20 @@ void USpellAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 	DOREPLIFETIME_CONDITION_NOTIFY(USpellAttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
 }
 
+void USpellAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+{
+	Super::PreAttributeChange(Attribute, NewValue);
+
+	if (Attribute == GetHealthAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxHealth());
+	}
+	if (Attribute == GetManaAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
+	}
+}
+
 void USpellAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(USpellAttributeSet, Health, OldHealth);

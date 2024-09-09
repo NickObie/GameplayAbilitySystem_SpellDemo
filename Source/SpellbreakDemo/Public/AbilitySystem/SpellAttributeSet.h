@@ -24,6 +24,8 @@ class SPELLBREAKDEMO_API USpellAttributeSet : public UAttributeSet
 public:
 	USpellAttributeSet();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	
 	UPROPERTY(BlueprintReadOnly, Replicated = OnRep_Health, Category = "Vital Attributes")
 	FGameplayAttributeData Health;
